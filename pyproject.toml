@@ -11,6 +11,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "djlint>=1.46.4",
     "ruff>=0.17.0",
 ]
 
@@ -23,3 +24,8 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "PTH"]
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 72
+
+[tool.djlint]
+profile = "jinja"
+indent = 4
+max_line_length = 100

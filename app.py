@@ -43,10 +43,22 @@ def get_user_or_redirect(user_id: int) -> User:
     """Return the user, or flash and redirect home
     if they don't exist."""
     user = data_manager.get_user(user_id)
+
     if user is None:
         flash("User not found.", "error")
         abort(redirect(url_for("index", _anchor="add-user")))
     return user
+
+
+def get_movie_or_redirect(user_id: int, movie_id: int) -> Movie:
+    """Return the move, or flash and redirect home
+    if they don't exist."""
+    movie = data_manager.get_movie(user_id, movie_id)
+
+    if movie is None:
+        flash(f"Movie with id: {movie_id} not found!", "error")
+        abort(redirect(url_for("get_movies", user_id=user_id)))
+    return movie
 
 
 @app.context_processor
@@ -102,23 +114,31 @@ def add_movie(user_id: int):
 )
 def update_movie(user_id: int, movie_id: int):
     """Rename one of the user's movies with the title from the form."""
+    get_user_or_redirect(user_id)
+    movie = get_movie_or_redirect(user_id, movie_id)
     title = normalize_text(request.form.get("title", ""))
 
     if not is_valid_text(title):
         flash("Title must contain at least one letter or number.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
 
-    user = get_user_or_redirect(user_id)
-
-    movie = data_manager.get_movie(user.id, movie_id)
-    if not movie:
-        flash(f"Movie with id: {movie_id} not found!", "error")
-        return redirect(url_for("get_movies", user_id=user_id))
     old_title = movie.title
 
     data_manager.update_movie(movie.id, new_title=title)
     flash(f"{old_title} successfully updated to {movie.title}", "success")
 
+    return redirect(url_for("get_movies", user_id=user_id))
+
+
+@app.route(
+    "/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"]
+)
+def delete_movie(user_id: int, movie_id: int):
+    user = get_user_or_redirect(user_id)
+    movie = get_movie_or_redirect(user_id, movie_id)
+    title = movie.title
+    data_manager.delete_movie(movie.id)
+    flash(f"Deleted {title} from {user.name}'s list.", "success")
     return redirect(url_for("get_movies", user_id=user_id))
 
 

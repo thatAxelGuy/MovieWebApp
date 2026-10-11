@@ -1,21 +1,20 @@
 {% extends "base.html" %}
-
 {% block title %}Movie App - Users{% endblock %}
-
 {% block content %}
     <h1>Users</h1>
     <ul class="user-list">
         {% for user in users %}
             <li class="user-item">
-                <a href="{{ url_for('get_movies', user_id=user.id) }}">
-                    {{ user.name }}
-                </a>
+                <a href="{{ url_for('get_movies', user_id=user.id) }}">{{ user.name }}</a>
             </li>
         {% else %}
             <li class="user-item">No users found. Add one below.</li>
         {% endfor %}
     </ul>
-    <form id="add-user" action="{{ url_for('create_user') }}" method="post" class="add-user-form">
+    <form id="add-user"
+          action="{{ url_for('create_user') }}"
+          method="post"
+          class="add-user-form">
         <input type="text" name="name" placeholder="Enter user name" required>
         <button type="submit">Add User</button>
     </form>

@@ -1,28 +1,47 @@
 {% extends "base.html" %}
-
 {% block title %}{{ user.name }}'s Movies{% endblock %}
-
 {% block content %}
     <h1>{{ user.name }}'s movie list</h1>
-    <form action="{{ url_for('add_movie', user_id=user.id) }}" method="post" class="add-movie-form">
+    <form action="{{ url_for('add_movie', user_id=user.id) }}"
+          method="post"
+          class="add-movie-form">
         <label for="movie-title">Movie title</label>
-        <input type="text" id="movie-title" name="title" placeholder="e.g. Alien"
-               maxlength="255" required>
+        <input type="text"
+               id="movie-title"
+               name="title"
+               placeholder="e.g. Alien"
+               maxlength="255"
+               required>
         <button type="submit">Find movie</button>
     </form>
     <ul>
         {% for movie in movies %}
             <li class="movie-item">
                 {% if movie.poster_url %}
-                    <img class="movie-poster" src="{{ movie.poster_url }}"
-                         alt="Poster for {{ movie.title }}" width="100" loading="lazy">
+                    <img class="movie-poster"
+                         src="{{ movie.poster_url }}"
+                         alt="Poster for {{ movie.title }}"
+                         width="100"
+                         loading="lazy">
                 {% endif %}
                 {{ movie.title }} {% if movie.year %}({{ movie.year }}){% endif %}
-                <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
-                      method="post" class="update-movie-form">
+                <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+                      method="post"
+                      class="delete-movie-form"
+                      onsubmit="return confirm('Delete this movie?')">
+                    <button type="submit">Delete movie</button>
+                </form>
+                <form id="update-movie"
+                      action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+                      method="post"
+                      class="update-movie-form">
                     <label for="update-title-{{ movie.id }}">New title</label>
-                    <input type="text" id="update-title-{{ movie.id }}" name="title"
-                           value="{{ movie.title }}" maxlength="255" required>
+                    <input type="text"
+                           id="update-title-{{ movie.id }}"
+                           name="title"
+                           value="{{ movie.title }}"
+                           maxlength="255"
+                           required>
                     <button type="submit">Rename</button>
                 </form>
             </li>
