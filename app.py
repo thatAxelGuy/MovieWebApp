@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 
 from data_manager import DataManager
-from models import db
+from models import Movie, db
+from omdb import OMDbAPIError, fetch_movie_details
 
 app = Flask(__name__)
 
@@ -52,6 +53,33 @@ def get_movies(user_id: int):
 
     movies = data_manager.get_movies(user_id)
     return render_template("movies.html", user=user, movies=movies)
+
+
+@app.route("/users/<int:user_id>/movies", methods=["POST"])
+def add_movie(user_id: int):
+    """Handle a movie submission for a user."""
+    user = data_manager.get_user(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("index"))
+    query = request.form.get("title", "")
+    query = " ".join(query.split())  # Collapse to single space
+    if not any(char.isalnum() for char in query):
+        flash("Title must contain at least one letter or number.", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+    try:
+        movie_details = fetch_movie_details(query)
+    except OMDbAPIError:
+        flash("Service unavailable", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+    if not movie_details:
+        flash(f"No movies found for: {query}.", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+    movie = Movie(**movie_details, user_id=user_id)
+    data_manager.add_movie(movie)
+    flash(f"'{movie.title}' added to {user.name}'s movie list.", "success")
+
+    return redirect(url_for("get_movies", user_id=user_id))
 
 
 @app.route("/users", methods=["POST"])

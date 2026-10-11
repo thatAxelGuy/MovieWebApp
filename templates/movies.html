@@ -6,10 +6,22 @@
     <h1>{{ user.name }}'s movie list</h1>
     <ul>
         {% for movie in movies %}
-            <li>{{ movie.title }} {% if movie.year %}({{ movie.year }}){% endif %}</li>
+            <li class="movie-item">
+                {% if movie.poster_url %}
+                    <img class="movie-poster" src="{{ movie.poster_url }}"
+                         alt="Poster for {{ movie.title }}" width="100" loading="lazy">
+                {% endif %}
+                {{ movie.title }} {% if movie.year %}({{ movie.year }}){% endif %}
+            </li>
         {% else %}
             <li>{{ user.name }} has no movies yet.</li>
         {% endfor %}
     </ul>
+    <form action="{{ url_for('add_movie', user_id=user.id) }}" method="post" class="add-movie-form">
+        <label for="movie-title">Movie title</label>
+        <input type="text" id="movie-title" name="title" placeholder="e.g. Alien"
+               maxlength="255" required>
+        <button type="submit">Find movie</button>
+    </form>
     <a class="back-to-users" href="{{ url_for('index') }}">Back to users</a>
 {% endblock %}
