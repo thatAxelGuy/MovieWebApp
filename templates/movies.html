@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }}'s Movies{% endblock %}
+
+{% block content %}
+    <h1>{{ user.name }}'s movie list</h1>
+    <ul>
+        {% for movie in movies %}
+            <li>{{ movie.title }} {% if movie.year %}({{ movie.year }}){% endif %}</li>
+        {% else %}
+            <li>{{ user.name }} has no movies yet.</li>
+        {% endfor %}
+    </ul>
+    <a class="back-to-users" href="{{ url_for('index') }}">Back to users</a>
+{% endblock %}
