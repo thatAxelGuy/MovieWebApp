@@ -21,6 +21,9 @@ class User(db.Model):
         back_populates="user", cascade="all, delete-orphan"
     )
 
+    def __repr__(self) -> str:
+        return f"<User {self.name}>"
+
 
 class Movie(db.Model):
     """A movie on a user's favorites list, with details from OMDb."""
@@ -34,3 +37,6 @@ class Movie(db.Model):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped["User"] = relationship(back_populates="movies")
+
+    def __repr__(self) -> str:
+        return f"<Movie {self.title} ({self.year})>"
