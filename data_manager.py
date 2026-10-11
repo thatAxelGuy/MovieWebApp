@@ -46,6 +46,13 @@ class DataManager:
             .all()
         )
 
+    def get_movie(self, user_id: int, movie_id: int) -> Movie | None:
+        return db.session.execute(
+            db.select(Movie).where(
+                Movie.user_id == user_id, Movie.id == movie_id
+            )
+        ).scalar_one_or_none()
+
     def update_movie(self, movie_id: int, new_title: str) -> Movie | None:
         try:
             movie = db.session.get(Movie, movie_id)

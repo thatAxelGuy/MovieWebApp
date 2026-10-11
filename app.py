@@ -10,6 +10,7 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from data_manager import DataManager
 from models import Movie, db
 from omdb import OMDbAPIError, fetch_movie_details
+from validation import is_valid_text, normalize_text
 
 app = Flask(__name__)
 
@@ -62,11 +63,13 @@ def add_movie(user_id: int):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("index"))
-    query = request.form.get("title", "")
-    query = " ".join(query.split())  # Collapse to single space
-    if not any(char.isalnum() for char in query):
+
+    query = normalize_text(request.form.get("title", ""))
+
+    if not is_valid_text(query):
         flash("Title must contain at least one letter or number.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
+
     try:
         movie_details = fetch_movie_details(query)
     except OMDbAPIError:
@@ -82,12 +85,40 @@ def add_movie(user_id: int):
     return redirect(url_for("get_movies", user_id=user_id))
 
 
+@app.route(
+    "/users/<int:user_id>/movies/<int:movie_id>/update", methods=["POST"]
+)
+def update_movie(user_id: int, movie_id: int):
+    """Rename one of the user's movies with the title from the form."""
+    title = normalize_text(request.form.get("title", ""))
+
+    if not is_valid_text(title):
+        flash("Title must contain at least one letter or number.", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+
+    user = data_manager.get_user(user_id)
+    if not user:
+        flash(f"User with id: {user_id} not found!", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+
+    movie = data_manager.get_movie(user.id, movie_id)
+    if not movie:
+        flash(f"Movie with id: {movie_id} not found!", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+    old_title = movie.title
+
+    data_manager.update_movie(movie.id, new_title=title)
+    flash(f"{old_title} successfully updated to {movie.title}", "success")
+
+    return redirect(url_for("get_movies", user_id=user_id))
+
+
 @app.route("/users", methods=["POST"])
 def create_user():
     """Create a new user."""
-    name = request.form.get("name", "")
-    name = " ".join(name.split())  # Collapse to single space
-    if not any(char.isalnum() for char in name):
+    name = normalize_text(request.form.get("name", ""))
+
+    if not is_valid_text(name):
         flash("User name must contain at least one letter or number.", "error")
         return redirect(url_for("index"))
     data_manager.create_user(name)
