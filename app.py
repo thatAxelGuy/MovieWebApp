@@ -1,3 +1,5 @@
+"""Main application file for the Movie App."""
+
 from pathlib import Path
 
 from flask import Flask

@@ -1,3 +1,7 @@
+"""Database models for the app."""
+
+from typing import TYPE_CHECKING
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -9,8 +13,13 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
+if TYPE_CHECKING:
+    Model = Base
+else:
+    Model = db.Model
 
-class User(db.Model):
+
+class User(Model):
     """A person registered in the app linked with favorite movies."""
 
     __tablename__ = "users"
@@ -25,7 +34,7 @@ class User(db.Model):
         return f"<User {self.name}>"
 
 
-class Movie(db.Model):
+class Movie(Model):
     """A movie on a user's favorites list, with details from OMDb."""
 
     __tablename__ = "movies"
