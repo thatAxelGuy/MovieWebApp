@@ -15,7 +15,7 @@
             <li class="user-item">No users found. Add one below.</li>
         {% endfor %}
     </ul>
-    <form action="{{ url_for('create_user') }}" method="post" class="add-user-form">
+    <form id="add-user" action="{{ url_for('create_user') }}" method="post" class="add-user-form">
         <input type="text" name="name" placeholder="Enter user name" required>
         <button type="submit">Add User</button>
     </form>

@@ -5,10 +5,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import (
+    Flask,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from data_manager import DataManager
-from models import Movie, db
+from models import Movie, User, db
 from omdb import OMDbAPIError, fetch_movie_details
 from validation import is_valid_text, normalize_text
 
@@ -31,6 +39,16 @@ db.init_app(app)
 data_manager = DataManager()
 
 
+def get_user_or_redirect(user_id: int) -> User:
+    """Return the user, or flash and redirect home
+    if they don't exist."""
+    user = data_manager.get_user(user_id)
+    if user is None:
+        flash("User not found.", "error")
+        abort(redirect(url_for("index", _anchor="add-user")))
+    return user
+
+
 @app.context_processor
 def inject_now():
     """Inject the current UTC time into the template context."""
@@ -47,10 +65,7 @@ def index():
 @app.route("/users/<int:user_id>/movies", methods=["GET"])
 def get_movies(user_id: int):
     """Render the movies page."""
-    user = data_manager.get_user(user_id)
-    if not user:
-        flash("User not found.", "error")
-        return redirect(url_for("index"))
+    user = get_user_or_redirect(user_id)
 
     movies = data_manager.get_movies(user_id)
     return render_template("movies.html", user=user, movies=movies)
@@ -59,10 +74,7 @@ def get_movies(user_id: int):
 @app.route("/users/<int:user_id>/movies", methods=["POST"])
 def add_movie(user_id: int):
     """Handle a movie submission for a user."""
-    user = data_manager.get_user(user_id)
-    if not user:
-        flash("User not found.", "error")
-        return redirect(url_for("index"))
+    user = get_user_or_redirect(user_id)
 
     query = normalize_text(request.form.get("title", ""))
 
@@ -96,10 +108,7 @@ def update_movie(user_id: int, movie_id: int):
         flash("Title must contain at least one letter or number.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
 
-    user = data_manager.get_user(user_id)
-    if not user:
-        flash(f"User with id: {user_id} not found!", "error")
-        return redirect(url_for("get_movies", user_id=user_id))
+    user = get_user_or_redirect(user_id)
 
     movie = data_manager.get_movie(user.id, movie_id)
     if not movie:
