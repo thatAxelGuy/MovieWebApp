@@ -102,6 +102,11 @@ def add_movie(user_id: int):
     if not movie_details:
         flash(f"No movies found for: {query}.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
+    movies = data_manager.get_movies(user_id)
+    for movie in movies:
+        if movie.imdb_id == movie_details["imdb_id"]:
+            flash(f"{movie.title} is already in your list.", "error")
+            return redirect(url_for("get_movies", user_id=user_id))
     movie = Movie(**movie_details, user_id=user_id)
     data_manager.add_movie(movie)
     flash(f"'{movie.title}' added to {user.name}'s movie list.", "success")

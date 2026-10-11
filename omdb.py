@@ -46,6 +46,7 @@ class MovieDetails(TypedDict):
     director: str | None
     year: str | None
     poster_url: str | None
+    imdb_id: str
 
 
 def fetch_movie_details(title: str) -> MovieDetails | None:
@@ -62,12 +63,17 @@ def fetch_movie_details(title: str) -> MovieDetails | None:
         raise OMDbAPIError(f"OMDb request for {title!r} failed.") from error
 
     if data.get("Response") == "True":
+        imdb = _clean_data(data.get("imdbID"))
+        if not imdb:
+            raise OMDbAPIError("No imdb key found")
+
         details = MovieDetails(
             title=_clean_data(data.get("Title"))
             or title,  # Use the provided title if the API doesn't return one
             director=_clean_data(data.get("Director")),
             year=_clean_data(data.get("Year")),
             poster_url=_clean_data(data.get("Poster")),
+            imdb_id=imdb,
         )
 
         return details
