@@ -155,6 +155,19 @@ def create_user():
     return redirect(url_for("index"))
 
 
+@app.errorhandler(500)
+def handle_500(error):
+    """Roll back the session and show the 500 error page."""
+    db.session.rollback()
+    return render_template("500.html"), 500
+
+
+@app.errorhandler(404)
+def handle_404(error):
+    """Show the 404 page for unknown URLs and missing resources."""
+    return render_template("404.html"), 404
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
