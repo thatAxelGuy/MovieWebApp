@@ -1,0 +1,8 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.flash.success { background: #e6f4ea; }
+.flash.error   { background: #fdecea; }

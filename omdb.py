@@ -54,14 +54,12 @@ def fetch_movie_details(title: str) -> MovieDetails | None:
 
     try:
         response = requests.get(
-            BASE_URL, params={"t": title, "apikey": OMDB_API_KEY}, timeout=5
+            BASE_URL, params={"t": title, "apikey": OMDB_API_KEY}, timeout=10
         )
         response.raise_for_status()
         data = response.json()
     except requests.RequestException as error:
-        raise OMDbAPIError(
-            f"OMDb request for {title!r} failed."
-        ) from error
+        raise OMDbAPIError(f"OMDb request for {title!r} failed.") from error
 
     if data.get("Response") == "True":
         details = MovieDetails(
