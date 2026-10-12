@@ -15,7 +15,13 @@
           action="{{ url_for('create_user') }}"
           method="post"
           class="add-user-form">
-        <input type="text" name="name" placeholder="Enter user name" required>
+        <label for="add-user-input">Username:</label>
+        <input id="add-user-input"
+               type="text"
+               name="name"
+               placeholder="Enter user name"
+               required
+               maxlength="100">
         <button type="submit">Add User</button>
     </form>
 {% endblock %}

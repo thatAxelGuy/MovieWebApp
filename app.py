@@ -56,7 +56,7 @@ def get_movie_or_redirect(user_id: int, movie_id: int) -> Movie:
     movie = data_manager.get_movie(user_id, movie_id)
 
     if movie is None:
-        flash(f"Movie with id: {movie_id} not found!", "error")
+        flash("Movie not found.", "error")
         abort(redirect(url_for("get_movies", user_id=user_id)))
     return movie
 
@@ -97,7 +97,10 @@ def add_movie(user_id: int):
     try:
         movie_details = fetch_movie_details(query)
     except OMDbAPIError:
-        flash("Service unavailable", "error")
+        flash(
+            "The movie service is unavailable. Please try again later.",
+            "error",
+        )
         return redirect(url_for("get_movies", user_id=user_id))
     if not movie_details:
         flash(f"No movies found for: {query}.", "error")
@@ -105,7 +108,7 @@ def add_movie(user_id: int):
     movies = data_manager.get_movies(user_id)
     for movie in movies:
         if movie.imdb_id == movie_details["imdb_id"]:
-            flash(f"{movie.title} is already in your list.", "error")
+            flash(f"'{movie.title}' is already in your list.", "error")
             return redirect(url_for("get_movies", user_id=user_id))
     movie = Movie(**movie_details, user_id=user_id)
     data_manager.add_movie(movie)
@@ -130,7 +133,7 @@ def update_movie(user_id: int, movie_id: int):
     old_title = movie.title
 
     data_manager.update_movie(movie.id, new_title=title)
-    flash(f"{old_title} successfully updated to {movie.title}", "success")
+    flash(f"'{old_title}' successfully updated to '{movie.title}'.", "success")
 
     return redirect(url_for("get_movies", user_id=user_id))
 
@@ -143,7 +146,7 @@ def delete_movie(user_id: int, movie_id: int):
     movie = get_movie_or_redirect(user_id, movie_id)
     title = movie.title
     data_manager.delete_movie(movie.id)
-    flash(f"Deleted {title} from {user.name}'s list.", "success")
+    flash(f"Deleted '{title}' from {user.name}'s list.", "success")
     return redirect(url_for("get_movies", user_id=user_id))
 
 
@@ -156,7 +159,7 @@ def create_user():
         flash("User name must contain at least one letter or number.", "error")
         return redirect(url_for("index"))
     data_manager.create_user(name)
-    flash(f"User {name} added.", "success")
+    flash(f"User '{name}' added.", "success")
     return redirect(url_for("index"))
 
 

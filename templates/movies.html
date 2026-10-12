@@ -5,7 +5,7 @@
     <form action="{{ url_for('add_movie', user_id=user.id) }}"
           method="post"
           class="add-movie-form">
-        <label for="movie-title">Movie title</label>
+        <label for="movie-title">Movie title:</label>
         <input type="text"
                id="movie-title"
                name="title"
@@ -35,7 +35,7 @@
                       action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
                       method="post"
                       class="update-movie-form">
-                    <label for="update-title-{{ movie.id }}">New title</label>
+                    <label for="update-title-{{ movie.id }}">New title:</label>
                     <input type="text"
                            id="update-title-{{ movie.id }}"
                            name="title"
