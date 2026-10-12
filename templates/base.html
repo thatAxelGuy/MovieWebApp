@@ -3,30 +3,41 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Movie App{% endblock %}</title>
+        <title>{% block title %}MoviWeb{% endblock %}</title>
+        <link rel="icon"
+              href="{{ url_for('static', filename='favicon.svg') }}"
+              type="image/svg+xml">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
-        <header>
-            <h1>Movie App</h1>
+        <header class="site-header">
+            <a class="logo" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='favicon.svg') }}"
+                     alt=""
+                     width="32"
+                     height="32">
+                MoviWeb
+            </a>
             <nav>
-                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('index') }}">Profiles</a>
             </nav>
         </header>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flashes">
-                    {% for category, message in messages %}
-                        <li class="flash {{ category }}">{{ message }}</li>
-                    {% endfor %}
+                    {% for category, message in messages %}<li class="flash {{ category }}">{{ message }}</li>{% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
         <main class="container">
             {% block content %}{% endblock %}
         </main>
-        <footer>
-            <p>© {{ now.year }} Movie App</p>
+        <footer class="site-footer">
+            <p>© {{ now.year }} MoviWeb · Movie data from OMDb</p>
         </footer>
     </body>
 </html>

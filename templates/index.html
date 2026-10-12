@@ -1,27 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Movie App - Users{% endblock %}
+{% block title %}MoviWeb - Who's watching?{% endblock %}
 {% block content %}
-    <h1>Users</h1>
+    <h1 class="page-title center">Who's watching?</h1>
     <ul class="user-list">
         {% for user in users %}
             <li class="user-item">
-                <a href="{{ url_for('get_movies', user_id=user.id) }}">{{ user.name }}</a>
+                <a href="{{ url_for('get_movies', user_id=user.id) }}">
+                    <span class="avatar" aria-hidden="true">{{ user.name[0] | upper }}</span>
+                    <span class="user-name">{{ user.name }}</span>
+                </a>
             </li>
         {% else %}
-            <li class="user-item">No users found. Add one below.</li>
+            <li class="empty">No profiles yet. Add the first one below.</li>
         {% endfor %}
     </ul>
     <form id="add-user"
           action="{{ url_for('create_user') }}"
           method="post"
-          class="add-user-form">
-        <label for="add-user-input">Username:</label>
+          class="inline-form add-user-form">
+        <label for="add-user-input" class="visually-hidden">Profile name</label>
         <input id="add-user-input"
                type="text"
                name="name"
-               placeholder="Enter user name"
+               placeholder="New profile name"
                required
                maxlength="100">
-        <button type="submit">Add User</button>
+        <button type="submit" class="btn btn-primary">Add profile</button>
     </form>
 {% endblock %}

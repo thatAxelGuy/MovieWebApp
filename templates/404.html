@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Movie App - Page not found{% endblock %}
+{% block title %}MoviWeb - Page not found{% endblock %}
 {% block content %}
     <section class="error-page">
         <h1>404 – Page not found</h1>
         <p>The page you are looking for doesn't exist or may have been removed.</p>
-        <a class="back-home" href="{{ url_for('index') }}">Back to users</a>
+        <a class="btn btn-primary" href="{{ url_for('index') }}">Back to profiles</a>
     </section>
 {% endblock %}
