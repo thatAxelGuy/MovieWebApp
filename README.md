@@ -6,6 +6,11 @@ the [OMDb API](https://www.omdbapi.com/).
 
 Built as a school project combining OOP, Flask and SQLAlchemy.
 
+**Live demo:** <https://thataxelguy.pythonanywhere.com>
+
+> This is a demo without authentication: anyone with the link can add,
+> rename and delete data.
+
 ## Features
 
 - Create users and pick one from the home page
@@ -14,6 +19,7 @@ Built as a school project combining OOP, Flask and SQLAlchemy.
 - Each movie can only be in a user's list once (matched by IMDb ID)
 - Input validation and flash messages for feedback
 - Custom 404 and 500 error pages
+- Dark, poster-first design that works on desktop and mobile
 
 ## Tech stack
 
@@ -79,6 +85,21 @@ uv run app.py
 Then open <http://127.0.0.1:5000>. The SQLite database is created
 automatically in `data/` on the first run.
 
+## Deployment
+
+The live demo runs on [PythonAnywhere](https://www.pythonanywhere.com/):
+
+1. Clone the repository and create a virtualenv with Python 3.13, then
+   `pip install -r requirements.txt`.
+2. Create `.env` in the project folder with `OMDB_API_KEY` and a new
+   `SECRET_KEY`.
+3. Add a web app with manual configuration (Python 3.13) and set the
+   source code folder, the virtualenv and a static files mapping
+   (`/static/` to the project's `static` folder).
+4. In the WSGI file, add the project folder to `sys.path`, load `.env`
+   and import the app with `from app import app as application`.
+5. Reload the web app. The database tables are created on startup.
+
 ## Project structure
 
 ```
@@ -90,6 +111,7 @@ MovieWebApp/
 ├── validation.py     # Helpers for cleaning and validating form input
 ├── data/             # SQLite database (not committed)
 ├── static/
+│   ├── favicon.svg
 │   └── style.css
 └── templates/
     ├── base.html
