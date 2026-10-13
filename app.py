@@ -127,12 +127,10 @@ def add_movie(user_id: int):
     q = normalize_text(request.args.get("q", ""))
     imdb_id = request.form.get("imdb_id", "").strip()
 
-    back = url_for(
-        "get_movies", user_id=user_id, q=q, _anchor="search-results"
-    )
+    back = url_for("get_movies", user_id=user_id, q=q)
 
     if not imdb_id:
-        flash("No movie selected", "error")
+        flash("No movie selected.", "error")
         return redirect(back)
 
     movies = data_manager.get_movies(user_id)
@@ -151,7 +149,7 @@ def add_movie(user_id: int):
         return redirect(back)
 
     if not movie_details:
-        flash("Couldn’t load that movie.”", "error")
+        flash("Couldn't load that movie.", "error")
         return redirect(back)
 
     movie = Movie(**movie_details, user_id=user_id)

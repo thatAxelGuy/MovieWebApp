@@ -17,15 +17,15 @@
         <button type="submit" class="btn btn-primary">Find movies</button>
     </form>
     {% if query %}
-        <section id="search-results">
+        <section class="search-panel" id="search-results">
             <div class="section-header">
-                <h2>Results for <strong>"{{ query }}"</strong></h2>
+                <h2>Results for "{{ query }}"</h2>
                 <a class="clear-search"
                    href="{{ url_for('get_movies', user_id=user.id) }}">Clear search</a>
             </div>
-            <ul class="movie-grid">
+            <ul class="movie-row">
                 {% for result in results %}
-                    <li class="movie-item">
+                    <li class="movie-item {% if result.imdb_id in added_ids %}is-added{% endif %}">
                         {% if result.poster_url %}
                             <img class="movie-poster"
                                  src="{{ result.poster_url }}"
@@ -36,7 +36,8 @@
                                  aria-hidden="true">{{ result.title }}</div>
                         {% endif %}
                         <div class="movie-info">
-                            <h2 class="movie-title">{{ result.title }}</h2>
+                            <h2 class="movie-title"
+                                title="{{ result.title }}">{{ result.title }}</h2>
                             <p class="movie-meta">{% if result.year %}{{ result.year }}{% endif %}</p>
                         </div>
                         {% if result.imdb_id in added_ids %}
