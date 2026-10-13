@@ -10,6 +10,8 @@
     --accent-hover: #f0353e;
     --success: #2e7d4f;
     --error: #a1262c;
+    --added: #2e7d4f53;
+    --added-text: #7fbf98;
     --radius: 6px;
     --display: "Bebas Neue", Impact, "Arial Narrow", sans-serif;
     --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -275,6 +277,93 @@ input[type="text"]:focus {
     max-width: 100%;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* Search results */
+
+.movie-row {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0;
+    padding-bottom: 1rem;
+    list-style: none;
+}
+
+.movie-row .movie-item {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 170px;
+    scroll-snap-align: start;
+}
+
+.search-panel {
+    background: var(--surface);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    margin-bottom: 2.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 {
+    margin: 0;
+}
+
+.clear-search {
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.clear-search:hover {
+    color: var(--text);
+}
+
+.add-result-form {
+    margin-top: auto;
+    width: 100%;
+}
+
+.badge {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1.1rem;
+    text-align: center;
+    border-radius: var(--radius);
+    background: var(--added);
+    color: var(--added-text);
+    margin-top: auto;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.movie-item.is-added {
+    opacity: 0.45;
+}
+
+.movie-item.is-added:hover{
+    opacity: 1;
+}
+
+
+
+/* Clamp titles to three lines so years and buttons line up */
+.movie-row .movie-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    min-height: 3.9em; /* fallback: 3 x line-height 1.3 */
+    min-height: 3lh;
 }
 
 /* Movie grid */

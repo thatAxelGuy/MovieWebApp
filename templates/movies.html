@@ -3,65 +3,112 @@
 {% block content %}
     <a class="back-link" href="{{ url_for('index') }}">← All profiles</a>
     <h1 class="page-title">{{ user.name }}'s list</h1>
-    <form action="{{ url_for('add_movie', user_id=user.id) }}"
-          method="post"
+    <form action="{{ url_for('get_movies', user_id=user.id) }}"
+          method="get"
           class="inline-form add-movie-form">
         <label for="movie-title" class="visually-hidden">Movie title</label>
         <input type="text"
                id="movie-title"
-               name="title"
+               name="q"
                placeholder="Search a movie title, e.g. Alien"
                maxlength="255"
+               value="{{ query }}"
                required>
-        <button type="submit" class="btn btn-primary">Add movie</button>
+        <button type="submit" class="btn btn-primary">Find movies</button>
     </form>
-    <ul class="movie-grid">
-        {% for movie in movies %}
-            <li class="movie-item">
-                {% if movie.poster_url %}
-                    <img class="movie-poster"
-                         src="{{ movie.poster_url }}"
-                         alt="Poster for {{ movie.title }}"
-                         loading="lazy">
+    {% if query %}
+        <section class="search-panel" id="search-results">
+            <div class="section-header">
+                <h2>Results for "{{ query }}"</h2>
+                <a class="clear-search"
+                   href="{{ url_for('get_movies', user_id=user.id) }}">Clear search</a>
+            </div>
+            <ul class="movie-row">
+                {% for result in results %}
+                    <li class="movie-item {% if result.imdb_id in added_ids %}is-added{% endif %}">
+                        {% if result.poster_url %}
+                            <img class="movie-poster"
+                                 src="{{ result.poster_url }}"
+                                 alt="Poster for {{ result.title }}"
+                                 loading="lazy">
+                        {% else %}
+                            <div class="movie-poster poster-placeholder"
+                                 aria-hidden="true">{{ result.title }}</div>
+                        {% endif %}
+                        <div class="movie-info">
+                            <h3 class="movie-title"
+                                title="{{ result.title }}">{{ result.title }}</h3>
+                            <p class="movie-meta">{% if result.year %}{{ result.year }}{% endif %}</p>
+                        </div>
+                        {% if result.imdb_id in added_ids %}
+                            <span class="badge">✓ In your list</span>
+                        {% else %}
+                            <form action="{{ url_for('add_movie', user_id=user.id, q=query) }}"
+                                  method="post"
+                                  class="add-result-form">
+                                <input type="hidden" name="imdb_id" value="{{ result.imdb_id }}">
+                                <button type="submit" class="btn btn-primary">Add to list</button>
+                            </form>
+                        {% endif %}
+                    </li>
                 {% else %}
-                    <div class="movie-poster poster-placeholder"
-                         aria-hidden="true">{{ movie.title }}</div>
-                {% endif %}
-                <div class="movie-info">
-                    <h2 class="movie-title">{{ movie.title }}</h2>
-                    <p class="movie-meta">
-                        {% if movie.year %}{{ movie.year }}{% endif %}
-                        {% if movie.year and movie.director %}·{% endif %}
-                        {% if movie.director %}{{ movie.director }}{% endif %}
-                    </p>
-                </div>
-                <div class="movie-actions">
-                    <details class="rename">
-                        <summary class="btn btn-ghost">Rename</summary>
-                        <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+                    <li class="empty">No results for {{ query }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+    <section id="my-list">
+        <h2>{{ user.name }}'s list</h2>
+        <ul class="movie-grid">
+            {% for movie in movies %}
+                <li class="movie-item">
+                    {% if movie.poster_url %}
+                        <img class="movie-poster"
+                             src="{{ movie.poster_url }}"
+                             alt="Poster for {{ movie.title }}"
+                             loading="lazy">
+                    {% else %}
+                        <div class="movie-poster poster-placeholder"
+                             aria-hidden="true">{{ movie.title }}</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <h3 class="movie-title">
+                            {{ movie.title }}
+                        </h2>
+                        <p class="movie-meta">
+                            {% if movie.year %}{{ movie.year }}{% endif %}
+                            {% if movie.year and movie.director %}·{% endif %}
+                            {% if movie.director %}{{ movie.director }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="movie-actions">
+                        <details class="rename">
+                            <summary class="btn btn-ghost">Rename</summary>
+                            <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+                                  method="post"
+                                  class="update-movie-form">
+                                <label for="update-title-{{ movie.id }}"
+                                       class="visually-hidden">New title</label>
+                                <input type="text"
+                                       id="update-title-{{ movie.id }}"
+                                       name="title"
+                                       value="{{ movie.title }}"
+                                       maxlength="255"
+                                       required>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </form>
+                        </details>
+                        <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
                               method="post"
-                              class="update-movie-form">
-                            <label for="update-title-{{ movie.id }}"
-                                   class="visually-hidden">New title</label>
-                            <input type="text"
-                                   id="update-title-{{ movie.id }}"
-                                   name="title"
-                                   value="{{ movie.title }}"
-                                   maxlength="255"
-                                   required>
-                            <button type="submit" class="btn btn-primary">Save</button>
+                              class="delete-movie-form"
+                              onsubmit="return confirm('Delete this movie?')">
+                            <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
-                    </details>
-                    <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
-                          method="post"
-                          class="delete-movie-form"
-                          onsubmit="return confirm('Delete this movie?')">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </div>
-            </li>
-        {% else %}
-            <li class="empty">{{ user.name }} has no movies yet. Search for one above.</li>
-        {% endfor %}
-    </ul>
+                    </div>
+                </li>
+            {% else %}
+                <li class="empty">{{ user.name }} has no movies yet. Search for one above.</li>
+            {% endfor %}
+        </ul>
+    </section>
 {% endblock %}
