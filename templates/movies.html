@@ -18,7 +18,11 @@
     </form>
     {% if query %}
         <section id="search-results">
-            <h2>Results for <strong>"{{ query }}"</strong></h2>
+            <div class="section-header">
+                <h2>Results for <strong>"{{ query }}"</strong></h2>
+                <a class="clear-search"
+                   href="{{ url_for('get_movies', user_id=user.id) }}">Clear search</a>
+            </div>
             <ul class="movie-grid">
                 {% for result in results %}
                     <li class="movie-item">
