@@ -40,7 +40,7 @@ class DataManager:
             db.session.execute(
                 db.select(Movie)
                 .where(Movie.user_id == user_id)
-                .order_by(Movie.title)
+                .order_by(Movie.id.desc())
             )
             .scalars()
             .all()
