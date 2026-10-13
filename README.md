@@ -1,8 +1,8 @@
 # MoviWeb App
 
-A small Flask web app for keeping lists of favourite movies. Users add a
-movie by title, and the app fetches the director, year and poster from
-the [OMDb API](https://www.omdbapi.com/).
+A small Flask web app for keeping lists of favourite movies. Users
+search for a movie, pick it from the results, and the app fetches the
+director, year and poster from the [OMDb API](https://www.omdbapi.com/).
 
 Built as a school project combining OOP, Flask and SQLAlchemy.
 
@@ -14,7 +14,9 @@ Built as a school project combining OOP, Flask and SQLAlchemy.
 ## Features
 
 - Create users and pick one from the home page
-- Add movies by title; details are fetched from OMDb
+- Search OMDb and see the results as a scrollable poster row
+- Add a movie straight from the results; details are fetched by IMDb ID
+- Results already in the list are marked and sorted to the end
 - Rename or delete movies in a user's list
 - Each movie can only be in a user's list once (matched by IMDb ID)
 - Input validation and flash messages for feedback
@@ -116,7 +118,7 @@ MovieWebApp/
 └── templates/
     ├── base.html
     ├── index.html    # User list and add-user form
-    ├── movies.html   # A user's movies: add, rename, delete
+    ├── movies.html   # A user's movies: search, add, rename, delete
     ├── 404.html
     └── 500.html
 ```
@@ -128,7 +130,8 @@ MovieWebApp/
 | GET    | `/`                                         | List users, add-user form |
 | POST   | `/users`                                    | Create a user             |
 | GET    | `/users/<user_id>/movies`                   | Show a user's movies      |
-| POST   | `/users/<user_id>/movies`                   | Add a movie via OMDb      |
+| GET    | `/users/<user_id>/movies?q=<title>`         | Search OMDb for movies    |
+| POST   | `/users/<user_id>/movies`                   | Add a movie by IMDb ID    |
 | POST   | `/users/<user_id>/movies/<movie_id>/update` | Rename a movie            |
 | POST   | `/users/<user_id>/movies/<movie_id>/delete` | Delete a movie            |
 
