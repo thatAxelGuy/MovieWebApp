@@ -49,6 +49,54 @@ class MovieDetails(TypedDict):
     imdb_id: str
 
 
+class SearchResult(TypedDict):
+    """Type dictionary for movie search results."""
+
+    title: str
+    year: str | None
+    poster_url: str | None
+    imdb_id: str
+
+
+def search_movies(query: str) -> list[SearchResult]:
+    """Search movies on OMDb based on user query."""
+    _validate_api_key()
+
+    try:
+        response = requests.get(
+            BASE_URL,
+            params={"s": query, "type": "movie", "apikey": OMDB_API_KEY},
+            timeout=10,
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException as error:
+        raise OMDbAPIError(
+            f"OMDb request for query: {query!r} failed."
+        ) from error
+
+    if data.get("Response") != "True":
+        return []
+
+    movie_results: list[SearchResult] = []
+    for item in data.get("Search") or []:
+        imdb = _clean_data(item.get("imdbID"))
+        title = _clean_data(item.get("Title"))
+
+        if not imdb or not title:
+            continue
+
+        search_result: SearchResult = {
+            "title": title,
+            "year": _clean_data(item.get("Year")),
+            "poster_url": _clean_data(item.get("Poster")),
+            "imdb_id": imdb,
+        }
+        movie_results.append(search_result)
+
+    return movie_results
+
+
 def fetch_movie_details(title: str) -> MovieDetails | None:
     """Fetch movie details from the OMDb API."""
     _validate_api_key()
