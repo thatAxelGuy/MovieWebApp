@@ -58,22 +58,27 @@ class SearchResult(TypedDict):
     imdb_id: str
 
 
-def search_movies(query: str) -> list[SearchResult]:
-    """Search movies on OMDb based on user query."""
+def _get(params: dict) -> dict:
+    """Return response data for given params."""
     _validate_api_key()
 
     try:
         response = requests.get(
             BASE_URL,
-            params={"s": query, "type": "movie", "apikey": OMDB_API_KEY},
+            params={**params, "apikey": OMDB_API_KEY},
             timeout=10,
         )
         response.raise_for_status()
         data = response.json()
     except requests.RequestException as error:
-        raise OMDbAPIError(
-            f"OMDb request for query: {query!r} failed."
-        ) from error
+        raise OMDbAPIError("OMDb request failed.") from error
+    return data
+
+
+def search_movies(query: str) -> list[SearchResult]:
+    """Search movies on OMDb based on user query."""
+    params = {"s": query, "type": "movie"}
+    data = _get(params)
 
     if data.get("Response") != "True":
         return []
@@ -97,32 +102,25 @@ def search_movies(query: str) -> list[SearchResult]:
     return movie_results
 
 
-def fetch_movie_details(title: str) -> MovieDetails | None:
-    """Fetch movie details from the OMDb API."""
-    _validate_api_key()
-
-    try:
-        response = requests.get(
-            BASE_URL, params={"t": title, "apikey": OMDB_API_KEY}, timeout=10
-        )
-        response.raise_for_status()
-        data = response.json()
-    except requests.RequestException as error:
-        raise OMDbAPIError(f"OMDb request for {title!r} failed.") from error
+def fetch_movie_by_id(imdb_id: str) -> MovieDetails | None:
+    """Fetch a movie by its IMDb ID."""
+    params = {"i": imdb_id, "type": "movie"}
+    data = _get(params)
 
     if data.get("Response") == "True":
         imdb = _clean_data(data.get("imdbID"))
-        if not imdb:
-            raise OMDbAPIError("No imdb key found")
+        title = _clean_data(data.get("Title"))
+
+        if not imdb or not title:
+            raise OMDbAPIError("OMDb returned a movie without imdb or title")
 
         details = MovieDetails(
-            title=_clean_data(data.get("Title"))
-            or title,  # Use the provided title if the API doesn't return one
+            title=title,
             director=_clean_data(data.get("Director")),
             year=_clean_data(data.get("Year")),
             poster_url=_clean_data(data.get("Poster")),
             imdb_id=imdb,
         )
-
         return details
+
     return None

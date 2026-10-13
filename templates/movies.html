@@ -35,6 +35,16 @@
                             <h2 class="movie-title">{{ result.title }}</h2>
                             <p class="movie-meta">{% if result.year %}{{ result.year }}{% endif %}</p>
                         </div>
+                        {% if result.imdb_id in added_ids %}
+                            <span class="badge">✓ In your list</span>
+                        {% else %}
+                            <form action="{{ url_for('add_movie', user_id=user.id, q=query) }}"
+                                  method="post"
+                                  class="add-result-form">
+                                <input type="hidden" name="imdb_id" value="{{ result.imdb_id }}">
+                                <button type="submit" class="btn btn-primary">Add to list</button>
+                            </form>
+                        {% endif %}
                     </li>
                 {% else %}
                     <li class="empty">No results for {{ query }}</li>
