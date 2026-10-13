@@ -101,6 +101,15 @@ def get_movies(user_id: int):
                     "error",
                 )
 
+    results = sorted(
+        results,
+        key=lambda result: (
+            result["imdb_id"] not in added_ids,
+            result["year"] or "",
+        ),
+        reverse=True,
+    )
+
     return render_template(
         "movies.html",
         user=user,
