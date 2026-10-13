@@ -36,8 +36,8 @@
                                  aria-hidden="true">{{ result.title }}</div>
                         {% endif %}
                         <div class="movie-info">
-                            <h2 class="movie-title"
-                                title="{{ result.title }}">{{ result.title }}</h2>
+                            <h3 class="movie-title"
+                                title="{{ result.title }}">{{ result.title }}</h3>
                             <p class="movie-meta">{% if result.year %}{{ result.year }}{% endif %}</p>
                         </div>
                         {% if result.imdb_id in added_ids %}
@@ -72,7 +72,9 @@
                              aria-hidden="true">{{ movie.title }}</div>
                     {% endif %}
                     <div class="movie-info">
-                        <h2 class="movie-title">{{ movie.title }}</h2>
+                        <h3 class="movie-title">
+                            {{ movie.title }}
+                        </h2>
                         <p class="movie-meta">
                             {% if movie.year %}{{ movie.year }}{% endif %}
                             {% if movie.year and movie.director %}·{% endif %}
