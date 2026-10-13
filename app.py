@@ -17,7 +17,7 @@ from flask import (
 
 from data_manager import DataManager
 from models import Movie, User, db
-from omdb import OMDbAPIError, fetch_movie_details
+from omdb import OMDbAPIError, SearchResult, fetch_movie_details, search_movies
 from validation import is_valid_text, normalize_text
 
 app = Flask(__name__)
@@ -81,9 +81,28 @@ def index():
 def get_movies(user_id: int):
     """Render the movies page."""
     user = get_user_or_redirect(user_id)
-
     movies = data_manager.get_movies(user_id)
-    return render_template("movies.html", user=user, movies=movies)
+
+    query = normalize_text(request.args.get("q", ""))
+
+    results: list[SearchResult] = []
+
+    if query:
+        if not is_valid_text(query):
+            flash("Title must contain at least one letter or number.", "error")
+        else:
+            try:
+                results = search_movies(query)
+            except OMDbAPIError:
+                flash(
+                    "The movie service is unavailable. "
+                    "Please try again later.",
+                    "error",
+                )
+
+    return render_template(
+        "movies.html", user=user, movies=movies, results=results, query=query
+    )
 
 
 @app.route("/users/<int:user_id>/movies", methods=["POST"])
@@ -105,16 +124,21 @@ def add_movie(user_id: int):
             "error",
         )
         return redirect(url_for("get_movies", user_id=user_id))
+
     if not movie_details:
         flash(f"No movies found for: {query}.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
+
     movies = data_manager.get_movies(user_id)
     for movie in movies:
         if movie.imdb_id == movie_details["imdb_id"]:
             flash(f"'{movie.title}' is already in your list.", "error")
             return redirect(url_for("get_movies", user_id=user_id))
+
     movie = Movie(**movie_details, user_id=user_id)
+
     data_manager.add_movie(movie)
+
     flash(f"'{movie.title}' added to {user.name}'s movie list.", "success")
 
     return redirect(url_for("get_movies", user_id=user_id))

@@ -3,17 +3,18 @@
 {% block content %}
     <a class="back-link" href="{{ url_for('index') }}">← All profiles</a>
     <h1 class="page-title">{{ user.name }}'s list</h1>
-    <form action="{{ url_for('add_movie', user_id=user.id) }}"
-          method="post"
+    <form action="{{ url_for('get_movies', user_id=user.id) }}"
+          method="get"
           class="inline-form add-movie-form">
         <label for="movie-title" class="visually-hidden">Movie title</label>
         <input type="text"
                id="movie-title"
-               name="title"
+               name="q"
                placeholder="Search a movie title, e.g. Alien"
                maxlength="255"
+               value="{{ query }}"
                required>
-        <button type="submit" class="btn btn-primary">Add movie</button>
+        <button type="submit" class="btn btn-primary">Find movies</button>
     </form>
     <ul class="movie-grid">
         {% for movie in movies %}
