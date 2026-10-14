@@ -39,6 +39,20 @@ def _clean_data(value: str | None) -> str | None:
     return value
 
 
+def _poster_is_reachable(url: str) -> bool:
+    """Check that a poster URL actually serves an image.
+
+    Network errors count as reachable so a temporary hiccup
+    doesn't drop a poster; the template falls back if it fails to load.
+    """
+    try:
+        response = requests.head(url, timeout=5, allow_redirects=True)
+    except requests.RequestException:
+        return True
+    content_type = response.headers.get("Content-Type", "")
+    return response.ok and content_type.startswith("image/")
+
+
 class MovieDetails(TypedDict):
     """Type dictionary for movie details."""
 
@@ -114,11 +128,15 @@ def fetch_movie_by_id(imdb_id: str) -> MovieDetails | None:
         if not imdb or not title:
             raise OMDbAPIError("OMDb returned a movie without imdb or title")
 
+        poster_url = _clean_data(data.get("Poster"))
+        if poster_url and not _poster_is_reachable(poster_url):
+            poster_url = None
+
         details = MovieDetails(
             title=title,
             director=_clean_data(data.get("Director")),
             year=_clean_data(data.get("Year")),
-            poster_url=_clean_data(data.get("Poster")),
+            poster_url=poster_url,
             imdb_id=imdb,
         )
         return details
