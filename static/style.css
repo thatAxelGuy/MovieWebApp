@@ -391,6 +391,10 @@ input[type="text"]:focus {
     transition: transform 0.2s;
 }
 
+.movie-poster[hidden] {
+    display: none;
+}
+
 .movie-item:hover .movie-poster {
     transform: scale(1.03);
 }

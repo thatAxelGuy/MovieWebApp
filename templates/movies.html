@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 {% block title %}{{ user.name }}'s Movies{% endblock %}
+{% macro poster(item) %}
+    {% if item.poster_url %}
+        <img class="movie-poster"
+             src="{{ item.poster_url }}"
+             alt="Poster for {{ item.title }}"
+             loading="lazy"
+             onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+        <div class="movie-poster poster-placeholder"
+             aria-hidden="true"
+             hidden>{{ item.title }}</div>
+    {% else %}
+        <div class="movie-poster poster-placeholder"
+             aria-hidden="true">{{ item.title }}</div>
+    {% endif %}
+{% endmacro %}
 {% block content %}
     <a class="back-link" href="{{ url_for('index') }}">← All profiles</a>
     <h1 class="page-title">{{ user.name }}'s list</h1>
@@ -26,15 +41,7 @@
             <ul class="movie-row">
                 {% for result in results %}
                     <li class="movie-item {% if result.imdb_id in added_ids %}is-added{% endif %}">
-                        {% if result.poster_url %}
-                            <img class="movie-poster"
-                                 src="{{ result.poster_url }}"
-                                 alt="Poster for {{ result.title }}"
-                                 loading="lazy">
-                        {% else %}
-                            <div class="movie-poster poster-placeholder"
-                                 aria-hidden="true">{{ result.title }}</div>
-                        {% endif %}
+                        {{ poster(result) }}
                         <div class="movie-info">
                             <h3 class="movie-title"
                                 title="{{ result.title }}">{{ result.title }}</h3>
@@ -62,19 +69,11 @@
         <ul class="movie-grid">
             {% for movie in movies %}
                 <li class="movie-item">
-                    {% if movie.poster_url %}
-                        <img class="movie-poster"
-                             src="{{ movie.poster_url }}"
-                             alt="Poster for {{ movie.title }}"
-                             loading="lazy">
-                    {% else %}
-                        <div class="movie-poster poster-placeholder"
-                             aria-hidden="true">{{ movie.title }}</div>
-                    {% endif %}
+                    {{ poster(movie) }}
                     <div class="movie-info">
                         <h3 class="movie-title">
                             {{ movie.title }}
-                        </h2>
+                        </h3>
                         <p class="movie-meta">
                             {% if movie.year %}{{ movie.year }}{% endif %}
                             {% if movie.year and movie.director %}·{% endif %}
