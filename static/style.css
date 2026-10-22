@@ -452,15 +452,26 @@ input[type="text"]:focus {
 
 .update-movie-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.25rem;
     margin-top: 0.4rem;
 }
 
 .update-movie-form input {
-    flex: 1;
+    flex: 1 1 100%;
     min-width: 0;
     padding: 0.35rem 0.5rem;
     font-size: 0.85rem;
+}
+
+.update-movie-form .rating-input {
+    flex: 1 1 0;
+}
+
+.movie-rating {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 /* Error pages */

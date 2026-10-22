@@ -9,7 +9,7 @@ Built as a school project combining OOP, Flask and SQLAlchemy.
 **Live demo:** <https://thataxelguy.pythonanywhere.com>
 
 > This is a demo without authentication: anyone with the link can add,
-> rename and delete data.
+> edit and delete data.
 
 ## Features
 
@@ -17,7 +17,7 @@ Built as a school project combining OOP, Flask and SQLAlchemy.
 - Search OMDb and see the results as a scrollable poster row
 - Add a movie straight from the results; details are fetched by IMDb ID
 - Results already in the list are marked and sorted to the end
-- Rename or delete movies in a user's list
+- Edit the title and your own 0–10 rating of a movie, or delete it
 - Each movie can only be in a user's list once (matched by IMDb ID)
 - Input validation and flash messages for feedback
 - Custom 404 and 500 error pages
@@ -118,7 +118,7 @@ MovieWebApp/
 └── templates/
     ├── base.html
     ├── index.html    # User list and add-user form
-    ├── movies.html   # A user's movies: search, add, rename, delete
+    ├── movies.html   # A user's movies: search, add, edit, delete
     ├── 404.html
     └── 500.html
 ```
@@ -132,7 +132,7 @@ MovieWebApp/
 | GET    | `/users/<user_id>/movies`                   | Show a user's movies      |
 | GET    | `/users/<user_id>/movies?q=<title>`         | Search OMDb for movies    |
 | POST   | `/users/<user_id>/movies`                   | Add a movie by IMDb ID    |
-| POST   | `/users/<user_id>/movies/<movie_id>/update` | Rename a movie            |
+| POST   | `/users/<user_id>/movies/<movie_id>/update` | Update title and rating    |
 | POST   | `/users/<user_id>/movies/<movie_id>/delete` | Delete a movie            |
 
 ## Development

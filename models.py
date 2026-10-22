@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import Float, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -46,6 +46,7 @@ class Movie(Model):
     year: Mapped[str | None] = mapped_column(String(10))
     poster_url: Mapped[str | None] = mapped_column(String(500))
     imdb_id: Mapped[str] = mapped_column(String(20))
+    rating: Mapped[float | None] = mapped_column(Float)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped["User"] = relationship(back_populates="movies")

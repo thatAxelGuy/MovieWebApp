@@ -53,12 +53,15 @@ class DataManager:
             )
         ).scalar_one_or_none()
 
-    def update_movie(self, movie_id: int, new_title: str) -> Movie | None:
+    def update_movie(
+        self, movie_id: int, new_title: str, rating: float | None
+    ) -> Movie | None:
         try:
             movie = db.session.get(Movie, movie_id)
 
             if movie:
                 movie.title = new_title
+                movie.rating = rating
                 db.session.commit()
                 return movie
             return None

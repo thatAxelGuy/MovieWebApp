@@ -14,11 +14,12 @@ from flask import (
     request,
     url_for,
 )
+from sqlalchemy import inspect, text
 
 from data_manager import DataManager
 from models import Movie, User, db
 from omdb import OMDbAPIError, SearchResult, fetch_movie_by_id, search_movies
-from validation import is_valid_text, normalize_text
+from validation import is_valid_text, normalize_text, parse_rating
 
 app = Flask(__name__)
 
@@ -40,6 +41,12 @@ data_manager = DataManager()
 
 with app.app_context():
     db.create_all()
+
+    # No migrations: add the rating column to databases created before it.
+    columns = [col["name"] for col in inspect(db.engine).get_columns("movies")]
+    if "rating" not in columns:
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE movies ADD COLUMN rating FLOAT"))
 
 
 def get_user_or_redirect(user_id: int) -> User:
@@ -165,7 +172,7 @@ def add_movie(user_id: int):
     "/users/<int:user_id>/movies/<int:movie_id>/update", methods=["POST"]
 )
 def update_movie(user_id: int, movie_id: int):
-    """Rename one of the user's movies with the title from the form."""
+    """Update the title and personal rating of one of the user's movies."""
     get_user_or_redirect(user_id)
     movie = get_movie_or_redirect(user_id, movie_id)
     title = normalize_text(request.form.get("title", ""))
@@ -174,10 +181,16 @@ def update_movie(user_id: int, movie_id: int):
         flash("Title must contain at least one letter or number.", "error")
         return redirect(url_for("get_movies", user_id=user_id))
 
+    try:
+        rating = parse_rating(request.form.get("rating", ""))
+    except ValueError:
+        flash("Rating must be a number between 0 and 10.", "error")
+        return redirect(url_for("get_movies", user_id=user_id))
+
     old_title = movie.title
 
-    data_manager.update_movie(movie.id, new_title=title)
-    flash(f"'{old_title}' successfully updated to '{movie.title}'.", "success")
+    data_manager.update_movie(movie.id, new_title=title, rating=rating)
+    flash(f"'{old_title}' successfully updated.", "success")
 
     return redirect(url_for("get_movies", user_id=user_id))
 
